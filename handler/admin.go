@@ -28,11 +28,11 @@ func createAdminHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func loginAdminHandler(w http.ResponseWriter, r *http.Request) {
+func changeAdminPasswordHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func changeAdminPasswordHandler(w http.ResponseWriter, r *http.Request) {
+func updateTicketStatusHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
