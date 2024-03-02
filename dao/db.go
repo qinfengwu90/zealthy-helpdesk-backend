@@ -6,21 +6,23 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
+	"strconv"
 	"zealthy-helpdesk-backend/model"
-)
-
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "Ps99672107"
-	dbname   = "postgres"
+	"zealthy-helpdesk-backend/viper"
 )
 
 var DB *sqlx.DB
 
 func DbInit() {
-	psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	DBPortString := viper.ViperReadEnvVar("DB_PORT")
+	DBPort, _ := strconv.Atoi(DBPortString)
+
+	psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		viper.ViperReadEnvVar("DB_HOST"),
+		DBPort,
+		viper.ViperReadEnvVar("DB_USER"),
+		viper.ViperReadEnvVar("DB_PASSWORD"),
+		viper.ViperReadEnvVar("DB_NAME"))
 
 	db, err := sqlx.Connect("postgres", psqlConn)
 	if err != nil {
@@ -116,4 +118,38 @@ func GetAllTickets() ([]model.Ticket, error) {
 		return nil, err
 	}
 	return tickets, nil
+}
+
+func ChangeAdminPassword(email string, passwordHash []byte) error {
+	// Change admin password
+	SQL := `UPDATE admins SET password = $1 WHERE email = $2`
+	args := []any{string(passwordHash), email}
+	_, err := DB.Exec(SQL, args...)
+	return err
+}
+
+func GetAdminPasswordHash(email string) (string, error) {
+	// Get admin password
+	SQL := `SELECT password FROM admins WHERE email = $1`
+	args := []any{email}
+	var passwordHash string
+	err := DB.Get(&passwordHash, SQL, args...)
+	return passwordHash, err
+}
+
+func CheckAdminExists(email string) (bool, error) {
+	// Check if admin exists
+	SQL := `SELECT EXISTS(SELECT 1 FROM admins WHERE email = $1)`
+	args := []any{email}
+	var exists bool
+	err := DB.Get(&exists, SQL, args...)
+	return exists, err
+}
+
+func UpdateTicketStatus(ticketID int64, status string) error {
+	// Update ticket status
+	SQL := `UPDATE helpdesk_ticket SET status = $1 WHERE id = $2`
+	args := []any{status, ticketID}
+	_, err := DB.Exec(SQL, args...)
+	return err
 }

@@ -1,23 +1,17 @@
 package service
 
 import (
+	"github.com/guregu/null"
 	"golang.org/x/crypto/bcrypt"
 	"zealthy-helpdesk-backend/dao"
 )
 
 func CheckAdminExists(email string) (bool, error) {
-	SQL := `SELECT EXISTS(SELECT 1 FROM admins WHERE email = $1)`
-	args := []any{email}
-	var exists bool
-	err := dao.DB.Get(&exists, SQL, args...)
-	return exists, err
+	return dao.CheckAdminExists(email)
 }
 
 func CheckAdminPassword(email, password string) (bool, error) {
-	SQL := `SELECT password FROM admins WHERE email = $1`
-	args := []any{email}
-	var passwordHash string
-	err := dao.DB.Get(&passwordHash, SQL, args...)
+	passwordHash, err := dao.GetAdminPasswordHash(email)
 	if err != nil {
 		return false, err
 	}
@@ -27,4 +21,22 @@ func CheckAdminPassword(email, password string) (bool, error) {
 func doPasswordMatch(password, passwordHash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(password))
 	return err == nil
+}
+
+func CreateAdmin(email string, password string, firstName null.String, lastName null.String) error {
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	return dao.CreateAdmin(email, passwordHash, firstName, lastName)
+}
+
+func ChangeAdminPassword(email, newPassword string) error {
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	return dao.ChangeAdminPassword(email, passwordHash)
 }
