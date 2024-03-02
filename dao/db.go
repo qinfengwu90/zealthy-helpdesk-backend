@@ -153,3 +153,11 @@ func UpdateTicketStatus(ticketID int64, status string) error {
 	_, err := DB.Exec(SQL, args...)
 	return err
 }
+
+func StoreTicketUpdateEmail(ticketID int64, message string) error {
+	// Store ticket update email
+	SQL := `INSERT INTO ticket_notification_email (ticket_id, message) VALUES ($1, $2)`
+	args := []any{ticketID, message}
+	_, err := DB.Exec(SQL, args...)
+	return err
+}

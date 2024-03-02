@@ -70,6 +70,7 @@ func updateTicketStatusHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	err = service.SendEmailUpdate(input.TicketID, input.Status)
 }
 
 func getAllTicketsHandler(w http.ResponseWriter, r *http.Request) {
