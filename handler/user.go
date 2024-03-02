@@ -33,6 +33,7 @@ func getAllTicketsFromUserHandler(w http.ResponseWriter, r *http.Request) {
 func editUserTicketHandler(w http.ResponseWriter, r *http.Request) {
 	// Get ticket info from request body
 	var input struct {
+		Email            string `json:"email"`
 		TicketID         string `json:"ticket_id"`
 		IssueDescription string `json:"issue_description"`
 	}
@@ -42,7 +43,7 @@ func editUserTicketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = dao.EditUserTicket(input.TicketID, input.IssueDescription)
+	err = dao.EditUserTicket(input.Email, input.TicketID, input.IssueDescription)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -62,7 +63,11 @@ func createTicketHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
+	err = createTicket(input.UserEmail, input.IssueDescription, input.FirstName, input.LastName)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func createTicket(userEmail, issueDescription string, firstName, lastName null.String) error {

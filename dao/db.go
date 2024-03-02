@@ -52,7 +52,7 @@ WHERE users.email = $1
 	return tickets, nil
 }
 
-func EditUserTicket(ticketID string, issueDescription string) error {
+func EditUserTicket(email, ticketID, issueDescription string) error {
 	// Edit user ticket
 	SQL := `UPDATE helpdesk_ticket
 SET issue_description = $1
@@ -97,4 +97,23 @@ func CreateTicket(userID int64, issueDescription string) error {
 	args := []any{userID, issueDescription}
 	_, err := DB.Exec(SQL, args...)
 	return err
+}
+
+func CreateAdmin(email string, passwordHash []byte, firstName, lastName null.String) error {
+	// Create admin
+	SQL := `INSERT INTO admins (email, password, first_name, last_name) VALUES ($1, $2, $3, $4)`
+	args := []any{email, passwordHash, firstName, lastName}
+	_, err := DB.Exec(SQL, args...)
+	return err
+}
+
+func GetAllTickets() ([]model.Ticket, error) {
+	// Get all tickets
+	SQL := `SELECT * FROM helpdesk_ticket`
+	var tickets []model.Ticket
+	err := DB.Select(&tickets, SQL)
+	if err != nil {
+		return nil, err
+	}
+	return tickets, nil
 }

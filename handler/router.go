@@ -10,7 +10,7 @@ func InitRouter() *chi.Mux {
 	router.Use(middleware.Logger)
 
 	router.Route("/admins", func(r chi.Router) {
-		r.Get("/create", createAdminHandler)
+		r.Post("/create", createAdminHandler)
 		r.Post("/login", loginAdminHandler)
 		r.Post("/password", changeAdminPasswordHandler)
 		r.Get("/all-tickets", getAllTicketsHandler)
