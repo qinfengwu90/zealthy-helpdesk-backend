@@ -8,10 +8,10 @@ import (
 	"zealthy-helpdesk-backend/utility"
 )
 
-func getAllTicketsFromUserHandler(w http.ResponseWriter, r *http.Request) {
+func getAllTicketsForUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user email from request body
 	var input struct {
-		UserEmail string `json:"user_email"`
+		UserEmail string `json:"userEmail"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
@@ -34,8 +34,8 @@ func editUserTicketHandler(w http.ResponseWriter, r *http.Request) {
 	// Get ticket info from request body
 	var input struct {
 		Email            string `json:"email"`
-		TicketID         string `json:"ticket_id"`
-		IssueDescription string `json:"issue_description"`
+		TicketID         string `json:"ticketId"`
+		IssueDescription string `json:"issueDescription"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
@@ -53,10 +53,10 @@ func editUserTicketHandler(w http.ResponseWriter, r *http.Request) {
 
 func createTicketHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		UserEmail        string      `json:"user_email"`
-		IssueDescription string      `json:"issue_description"`
-		FirstName        null.String `json:"first_name"`
-		LastName         null.String `json:"last_name"`
+		UserEmail        string      `json:"userEmail"`
+		IssueDescription string      `json:"issueDescription"`
+		FirstName        null.String `json:"firstName"`
+		LastName         null.String `json:"lastName"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {

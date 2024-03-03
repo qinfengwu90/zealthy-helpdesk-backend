@@ -9,19 +9,19 @@ import (
 	"zealthy-helpdesk-backend/utility"
 )
 
-func createAdminHandler(w http.ResponseWriter, r *http.Request) {
+func registerAdminHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		UserEmail string      `json:"user_email"`
-		Password  string      `json:"password"`
-		FirstName null.String `json:"first_name"`
-		LastName  null.String `json:"last_name"`
+		AdminEmail string      `json:"adminEmail"`
+		Password   string      `json:"password"`
+		FirstName  null.String `json:"firstName"`
+		LastName   null.String `json:"lastName"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	err = service.CreateAdmin(input.UserEmail, input.Password, input.FirstName, input.LastName)
+	err = service.CreateAdmin(input.AdminEmail, input.Password, input.FirstName, input.LastName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -31,8 +31,8 @@ func createAdminHandler(w http.ResponseWriter, r *http.Request) {
 func changeAdminPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Email       string `json:"email"`
-		OldPassword string `json:"old_password"`
-		NewPassword string `json:"new_password"`
+		OldPassword string `json:"oldPassword"`
+		NewPassword string `json:"newPassword"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
@@ -57,7 +57,7 @@ func changeAdminPasswordHandler(w http.ResponseWriter, r *http.Request) {
 
 func updateTicketStatusHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		TicketID int64  `json:"ticket_id"`
+		TicketID int64  `json:"ticketId"`
 		Status   string `json:"status"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&input)

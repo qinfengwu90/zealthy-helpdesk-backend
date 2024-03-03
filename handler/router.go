@@ -14,25 +14,24 @@ func InitRouter() *chi.Mux {
 	tokenAuth := jwtauth.New(jwt.SigningMethodHS256.Name, []byte(viper.ViperReadEnvVar("JWT_SECRET")), nil)
 
 	router.Route("/admins", func(r chi.Router) {
-		r.Post("/login", loginAdminHandler)
-		r.Get("/all-tickets", getAllTicketsHandler)
-		r.Get("/sign-in", loginAdminHandler)
+		r.Get("/login", loginAdminHandler)
 
 		r.Group(func(r chi.Router) {
 			//r.Use(adminAuthMiddleware)
 			r.Use(jwtauth.Verifier(tokenAuth))
 			r.Use(jwtauth.Authenticator(tokenAuth))
 
-			r.Post("/create", createAdminHandler)
-			r.Post("/password", changeAdminPasswordHandler)
+			r.Get("/all-tickets", getAllTicketsHandler)
+			r.Post("/register-admin", registerAdminHandler)
+			r.Post("/change-password", changeAdminPasswordHandler)
 			r.Post("/update-ticket-status", updateTicketStatusHandler)
 		})
 	})
 
 	router.Route("/users", func(r chi.Router) {
-		r.Get("/all-tickets", getAllTicketsFromUserHandler)
+		r.Get("/all-tickets", getAllTicketsForUserHandler)
+		r.Post("/create-ticket", createTicketHandler)
 		r.Post("/edit-ticket", editUserTicketHandler)
-		r.Post("/create", createTicketHandler)
 	})
 
 	return router
