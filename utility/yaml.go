@@ -8,11 +8,12 @@ import (
 )
 
 type PostgresInfo struct {
-	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
-	Password string `yaml:"password"`
-	Username string `yaml:"username"`
-	Dbname   string `yaml:"dbname"`
+	Host                   string `yaml:"host"`
+	Port                   string `yaml:"port"`
+	Password               string `yaml:"password"`
+	Username               string `yaml:"username"`
+	Dbname                 string `yaml:"dbname"`
+	CloudSqlConnectionName string `yaml:"cloud_sql_connection_name"`
 }
 
 type JWTInfo struct {

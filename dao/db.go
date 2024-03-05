@@ -3,6 +3,7 @@ package dao
 import (
 	"fmt"
 	"github.com/guregu/null"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
@@ -17,37 +18,34 @@ func DbInit(dbConfig *utility.PostgresInfo) {
 	DBPortString := dbConfig.Port
 	DBPort, _ := strconv.Atoi(DBPortString)
 
-	psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		dbConfig.Host,
-		DBPort,
+	unixSocketPath := fmt.Sprintf("/cloudsql/%s/.s.PGSQL.5432", dbConfig.CloudSqlConnectionName)
+
+	psqSocketConn := fmt.Sprintf("%s:%s@unix(%s)/%s?parseTime=true",
 		dbConfig.Username,
 		dbConfig.Password,
+		unixSocketPath,
 		dbConfig.Dbname)
 
-	db, err := sqlx.Connect("postgres", psqlConn)
-	if err != nil {
-		log.Fatal(err)
-	}
-	DB = db
-}
+	db, err := sqlx.Connect("postgres", psqSocketConn)
 
-//func DbInit() {
-//	DBPortString := viper.ViperReadEnvVar("DB_PORT")
-//	DBPort, _ := strconv.Atoi(DBPortString)
-//
-//	psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-//		viper.ViperReadEnvVar("DB_HOST"),
-//		DBPort,
-//		viper.ViperReadEnvVar("DB_USER"),
-//		viper.ViperReadEnvVar("DB_PASSWORD"),
-//		viper.ViperReadEnvVar("DB_NAME"))
-//
-//	db, err := sqlx.Connect("postgres", psqlConn)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	DB = db
-//}
+	if err != nil {
+		psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+			dbConfig.Host,
+			DBPort,
+			dbConfig.Username,
+			dbConfig.Password,
+			dbConfig.Dbname)
+
+		db, err := sqlx.Connect("postgres", psqlConn)
+		if err != nil {
+			log.Fatal(err)
+		}
+		DB = db
+
+	} else {
+		DB = db
+	}
+}
 
 func GetAllTicketsAndFromUser(email, lastName string) ([]model.Ticket, error) {
 	// Get all tickets from user
