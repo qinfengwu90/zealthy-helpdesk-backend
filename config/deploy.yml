@@ -5,6 +5,7 @@ postgres:
   dbname: "postgres"
   password: "Ps99672107"
   cloud_sql_connection_name: "helpdesk-416222:us-east1:helpdesk-ticketing"
+  vpc_private_host: "10.30.240.3"
 
 jwt:
   secret: "ef738a1f3652031e3b8c8a423f3c974230eb4deef8499c161c040cd57cb7a558"

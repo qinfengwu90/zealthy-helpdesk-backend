@@ -14,6 +14,7 @@ type PostgresInfo struct {
 	Username               string `yaml:"username"`
 	Dbname                 string `yaml:"dbname"`
 	CloudSqlConnectionName string `yaml:"cloud_sql_connection_name"`
+	VpcPrivateHost         string `yaml:"vpc_private_host"`
 }
 
 type JWTInfo struct {
