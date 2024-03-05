@@ -40,3 +40,7 @@ func ChangeAdminPassword(email, newPassword string) error {
 
 	return dao.ChangeAdminPassword(email, passwordHash)
 }
+
+func DeleteTicket(ticketID int64) error {
+	return dao.DeleteTicket(ticketID)
+}

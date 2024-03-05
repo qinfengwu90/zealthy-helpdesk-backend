@@ -49,3 +49,21 @@ func loginAdminHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	utility.RespondJson(w, map[string]any{"token": tokenString})
 }
+
+func deleteTicketHandler(w http.ResponseWriter, r *http.Request) {
+	// Get ticket id from request body
+	var input struct {
+		TicketID int64 `json:"ticketId"`
+	}
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	err = service.DeleteTicket(input.TicketID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}

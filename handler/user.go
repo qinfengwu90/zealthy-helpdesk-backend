@@ -5,13 +5,15 @@ import (
 	"github.com/guregu/null"
 	"net/http"
 	"zealthy-helpdesk-backend/dao"
+	"zealthy-helpdesk-backend/service"
 	"zealthy-helpdesk-backend/utility"
 )
 
-func getAllTicketsForUserHandler(w http.ResponseWriter, r *http.Request) {
+func getAllTicketsAndEmailUpdatesForUserHandler(w http.ResponseWriter, r *http.Request) {
 	// Get user email from request body
 	var input struct {
 		UserEmail string `json:"userEmail"`
+		LastName  string `json:"lastName"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
@@ -20,14 +22,14 @@ func getAllTicketsForUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get all tickets from user
-	tickets, err := dao.GetAllTicketsFromUser(input.UserEmail)
+	tickets, email, err := service.GetAllTicketsAndEmailUpdatesFromUser(input.UserEmail, input.LastName)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// Return all tickets
-	utility.RespondJson(w, map[string]any{"tickets": tickets})
+	utility.RespondJson(w, map[string]any{"tickets": tickets, "emails": email})
 }
 
 func editUserTicketHandler(w http.ResponseWriter, r *http.Request) {

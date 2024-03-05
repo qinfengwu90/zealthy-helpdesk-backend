@@ -57,20 +57,21 @@ func changeAdminPasswordHandler(w http.ResponseWriter, r *http.Request) {
 
 func updateTicketStatusHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
-		TicketID int64  `json:"ticketId"`
-		Status   string `json:"status"`
+		TicketID      int64       `json:"ticketId"`
+		Status        null.String `json:"status"`
+		AdminResponse null.String `json:"adminResponse"`
 	}
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	err = dao.UpdateTicketStatus(input.TicketID, input.Status)
+	err = dao.UpdateTicketStatus(input.TicketID, input.Status, input.AdminResponse)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = service.SendEmailUpdate(input.TicketID, input.Status)
+	err = service.SendEmailUpdate(input.TicketID, input.Status, input.AdminResponse)
 }
 
 func getAllTicketsHandler(w http.ResponseWriter, r *http.Request) {

@@ -31,7 +31,7 @@ func DbInit() {
 	DB = db
 }
 
-func GetAllTicketsFromUser(email string) ([]model.Ticket, error) {
+func GetAllTicketsAndFromUser(email, lastName string) ([]model.Ticket, error) {
 	// Get all tickets from user
 	SQL := `SELECT helpdesk_ticket.id, 
        helpdesk_ticket.user_id, 
@@ -44,14 +44,39 @@ func GetAllTicketsFromUser(email string) ([]model.Ticket, error) {
 FROM helpdesk_ticket 
 JOIN users ON helpdesk_ticket.user_id = users.id
 WHERE users.email = $1
+  AND users.last_name = $2
+  AND helpdesk_ticket.archived_at IS NULL
+ORDER BY helpdesk_ticket.updated_at DESC
 `
-	args := []any{email}
+	args := []any{email, lastName}
 	var tickets []model.Ticket
 	err := DB.Select(&tickets, SQL, args...)
 	if err != nil {
 		return nil, err
 	}
 	return tickets, nil
+}
+
+func GetEmailUpdatesForTickets(email, lastName string) ([]model.Notification, error) {
+	// Get email updates for tickets
+	SQL := `SELECT ticket_notification_email.id, 
+	   ticket_notification_email.ticket_id, 
+	   ticket_notification_email.message, 
+	   ticket_notification_email.created_at
+FROM ticket_notification_email
+JOIN helpdesk_ticket ON ticket_notification_email.ticket_id = helpdesk_ticket.id
+JOIN users ON helpdesk_ticket.user_id = users.id
+WHERE users.email = $1
+  AND users.last_name = $2
+ORDER BY ticket_notification_email.created_at DESC
+`
+	args := []any{email, lastName}
+	var notifications []model.Notification
+	err := DB.Select(&notifications, SQL, args...)
+	if err != nil {
+		return nil, err
+	}
+	return notifications, nil
 }
 
 func EditUserTicket(email, ticketID, issueDescription string) error {
@@ -77,7 +102,7 @@ func CheckUserExists(email string) (bool, error) {
 func CreateUser(email string, firstName, lastName null.String) (int64, error) {
 	// Create user
 	SQL := `INSERT INTO users (email, first_name, last_name) VALUES ($1, $2, $3)
-INTERSECT `
+RETURNING id`
 	args := []any{email, firstName, lastName}
 	var userID int64
 	err := DB.Get(&userID, SQL, args...)
@@ -111,7 +136,20 @@ func CreateAdmin(email string, passwordHash []byte, firstName, lastName null.Str
 
 func GetAllTickets() ([]model.Ticket, error) {
 	// Get all tickets
-	SQL := `SELECT * FROM helpdesk_ticket`
+	SQL := `SELECT helpdesk_ticket.id,
+       helpdesk_ticket.user_id,
+       users.first_name,
+       users.last_name,
+       helpdesk_ticket.issue_description,
+       helpdesk_ticket.status,
+       helpdesk_ticket.admin_response,
+       helpdesk_ticket.created_at,
+       helpdesk_ticket.updated_at
+FROM helpdesk_ticket
+JOIN users ON helpdesk_ticket.user_id = users.id
+WHERE helpdesk_ticket.archived_at IS NULL
+ORDER BY helpdesk_ticket.updated_at
+`
 	var tickets []model.Ticket
 	err := DB.Select(&tickets, SQL)
 	if err != nil {
@@ -146,10 +184,12 @@ func CheckAdminExists(email string) (bool, error) {
 	return exists, err
 }
 
-func UpdateTicketStatus(ticketID int64, status string) error {
+func UpdateTicketStatus(ticketID int64, status, adminResponse null.String) error {
 	// Update ticket status
-	SQL := `UPDATE helpdesk_ticket SET status = $1 WHERE id = $2`
-	args := []any{status, ticketID}
+	SQL := `UPDATE helpdesk_ticket 
+SET status = $1, admin_response = $2
+WHERE id = $3`
+	args := []any{status, adminResponse, ticketID}
 	_, err := DB.Exec(SQL, args...)
 	return err
 }
@@ -158,6 +198,14 @@ func StoreTicketUpdateEmail(ticketID int64, message string) error {
 	// Store ticket update email
 	SQL := `INSERT INTO ticket_notification_email (ticket_id, message) VALUES ($1, $2)`
 	args := []any{ticketID, message}
+	_, err := DB.Exec(SQL, args...)
+	return err
+}
+
+func DeleteTicket(ticketID int64) error {
+	// Delete ticket
+	SQL := `UPDATE helpdesk_ticket SET archived_at = NOW() WHERE id = $1`
+	args := []any{ticketID}
 	_, err := DB.Exec(SQL, args...)
 	return err
 }
