@@ -12,15 +12,18 @@ COPY go.mod go.sum /goapp/
 RUN go mod download
 
 # Copy the rest of the application code
-COPY . /goapp
+COPY . ./
 #COPY .env /goapp
 
 # Build the Go application
-RUN go build -o main .
+#RUN #go build -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
+
 
 # Expose the application on port 8080
 EXPOSE 8080
 
 # Set the entry point command to run the built binary
+CMD ["/docker-gs-ping"]
 #CMD ["./main"]
-CMD ["/usr/local/go/bin/go", "run", "main.go"]
+#CMD ["/usr/local/go/bin/go", "run", "main.go"]
