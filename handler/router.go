@@ -6,14 +6,17 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/go-chi/jwtauth/v5"
 	"github.com/golang-jwt/jwt"
-	"zealthy-helpdesk-backend/viper"
+	"zealthy-helpdesk-backend/utility"
 )
 
-func InitRouter() *chi.Mux {
+var jwtConfig *utility.JWTInfo
+
+func InitRouter(JWTConfig *utility.JWTInfo) *chi.Mux {
+	jwtConfig = JWTConfig
 	router := chi.NewRouter()
 	router.Use(cors.AllowAll().Handler)
 	router.Use(middleware.Logger)
-	tokenAuth := jwtauth.New(jwt.SigningMethodHS256.Name, []byte(viper.ViperReadEnvVar("JWT_SECRET")), nil)
+	tokenAuth := jwtauth.New(jwt.SigningMethodHS256.Name, []byte(JWTConfig.Secret), nil)
 
 	router.Route("/", func(r chi.Router) {
 		r.Post("/delete-ticket", deleteTicketHandler)

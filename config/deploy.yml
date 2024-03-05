@@ -1,0 +1,9 @@
+postgres:
+  host: "35.196.92.178"
+  username: "postgres"
+  port: "5432"
+  dbname: "postgres"
+  password: "Ps99672107"
+
+jwt:
+  secret: "ef738a1f3652031e3b8c8a423f3c974230eb4deef8499c161c040cd57cb7a558"

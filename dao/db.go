@@ -8,21 +8,21 @@ import (
 	"log"
 	"strconv"
 	"zealthy-helpdesk-backend/model"
-	"zealthy-helpdesk-backend/viper"
+	"zealthy-helpdesk-backend/utility"
 )
 
 var DB *sqlx.DB
 
-func DbInit() {
-	DBPortString := viper.ViperReadEnvVar("DB_PORT")
+func DbInit(dbConfig *utility.PostgresInfo) {
+	DBPortString := dbConfig.Port
 	DBPort, _ := strconv.Atoi(DBPortString)
 
 	psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		viper.ViperReadEnvVar("DB_HOST"),
+		dbConfig.Host,
 		DBPort,
-		viper.ViperReadEnvVar("DB_USER"),
-		viper.ViperReadEnvVar("DB_PASSWORD"),
-		viper.ViperReadEnvVar("DB_NAME"))
+		dbConfig.Username,
+		dbConfig.Password,
+		dbConfig.Dbname)
 
 	db, err := sqlx.Connect("postgres", psqlConn)
 	if err != nil {
@@ -30,6 +30,24 @@ func DbInit() {
 	}
 	DB = db
 }
+
+//func DbInit() {
+//	DBPortString := viper.ViperReadEnvVar("DB_PORT")
+//	DBPort, _ := strconv.Atoi(DBPortString)
+//
+//	psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+//		viper.ViperReadEnvVar("DB_HOST"),
+//		DBPort,
+//		viper.ViperReadEnvVar("DB_USER"),
+//		viper.ViperReadEnvVar("DB_PASSWORD"),
+//		viper.ViperReadEnvVar("DB_NAME"))
+//
+//	db, err := sqlx.Connect("postgres", psqlConn)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	DB = db
+//}
 
 func GetAllTicketsAndFromUser(email, lastName string) ([]model.Ticket, error) {
 	// Get all tickets from user

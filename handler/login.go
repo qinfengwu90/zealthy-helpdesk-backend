@@ -8,13 +8,12 @@ import (
 	"zealthy-helpdesk-backend/model"
 	"zealthy-helpdesk-backend/service"
 	"zealthy-helpdesk-backend/utility"
-	"zealthy-helpdesk-backend/viper"
 )
 
 func loginAdminHandler(w http.ResponseWriter, r *http.Request) {
-	mySigningKey := viper.ViperReadEnvVar("JWT_SECRET")
+	mySigningKey := jwtConfig.Secret
 	var admin model.Admin
-	// TODO need to extract Bearer token from request header
+
 	if err := json.NewDecoder(r.Body).Decode(&admin); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

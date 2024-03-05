@@ -3,15 +3,16 @@ FROM golang:1.22-alpine
 
 # Set the working directory inside the container
 WORKDIR /goapp
+#COPY ./ /goapp
 
 # Copy the Go module files
-COPY go.mod go.sum ./
+COPY go.mod go.sum /goapp/
 
 # Download the dependencies
 RUN go mod download
 
 # Copy the rest of the application code
-COPY . .
+COPY . /goapp
 #COPY .env /goapp
 
 # Build the Go application
@@ -21,4 +22,5 @@ RUN go build -o main .
 EXPOSE 8080
 
 # Set the entry point command to run the built binary
-CMD ["./main"]
+#CMD ["./main"]
+CMD ["/usr/local/go/bin/go", "run", "main.go"]
