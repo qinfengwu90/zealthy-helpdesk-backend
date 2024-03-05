@@ -18,23 +18,24 @@ func DbInit(dbConfig *utility.PostgresInfo) {
 	DBPortString := dbConfig.Port
 	DBPort, _ := strconv.Atoi(DBPortString)
 
-	psqlVpcConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		dbConfig.VpcPrivateHost,
+	psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		dbConfig.Host,
 		DBPort,
 		dbConfig.Username,
 		dbConfig.Password,
 		dbConfig.Dbname)
 
-	db, err := sqlx.Connect("postgres", psqlVpcConn)
+	db, err := sqlx.Connect("postgres", psqlConn)
+
 	if err != nil {
-		psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-			dbConfig.Host,
+		psqlVpcConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+			dbConfig.VpcPrivateHost,
 			DBPort,
 			dbConfig.Username,
 			dbConfig.Password,
 			dbConfig.Dbname)
 
-		db, err := sqlx.Connect("postgres", psqlConn)
+		db, err := sqlx.Connect("postgres", psqlVpcConn)
 		if err != nil {
 			log.Fatal(err)
 		}
