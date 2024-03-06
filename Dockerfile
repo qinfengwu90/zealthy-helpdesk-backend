@@ -3,7 +3,6 @@ FROM golang:1.22-alpine
 
 # Set the working directory inside the container
 WORKDIR /goapp
-#COPY ./ /goapp
 
 # Copy the Go module files
 COPY go.mod go.sum /goapp/
@@ -13,10 +12,8 @@ RUN go mod download
 
 # Copy the rest of the application code
 COPY . ./
-#COPY .env /goapp
 
 # Build the Go application
-#RUN #go build -o main .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
 
 
@@ -25,5 +22,3 @@ EXPOSE 8080
 
 # Set the entry point command to run the built binary
 CMD ["/docker-gs-ping"]
-#CMD ["./main"]
-#CMD ["/usr/local/go/bin/go", "run", "main.go"]
