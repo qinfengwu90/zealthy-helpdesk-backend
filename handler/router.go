@@ -26,7 +26,6 @@ func InitRouter(JWTConfig *utility.JWTInfo) *chi.Mux {
 		r.Post("/login", loginAdminHandler)
 
 		r.Group(func(r chi.Router) {
-			//r.Use(adminAuthMiddleware)
 			r.Use(jwtauth.Verifier(tokenAuth))
 			r.Use(jwtauth.Authenticator(tokenAuth))
 

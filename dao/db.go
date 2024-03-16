@@ -93,7 +93,7 @@ ORDER BY ticket_notification_email.created_at DESC
 	return notifications, nil
 }
 
-func EditUserTicket(email, ticketID, issueDescription string) error {
+func EditUserTicket(ticketID, issueDescription string) error {
 	// Edit user ticket
 	SQL := `UPDATE helpdesk_ticket
 SET issue_description = $1
@@ -151,6 +151,7 @@ func CreateAdmin(email string, passwordHash []byte, firstName, lastName null.Str
 func GetAllTickets() ([]model.Ticket, error) {
 	// Get all tickets
 	SQL := `SELECT helpdesk_ticket.id,
+       users.email,
        helpdesk_ticket.user_id,
        users.first_name,
        users.last_name,

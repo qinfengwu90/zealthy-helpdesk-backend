@@ -30,6 +30,7 @@ type Admin struct {
 type Ticket struct {
 	Id               int64       `json:"id" db:"id"`
 	UserId           int64       `json:"userId" db:"user_id"`
+	Email            string      `json:"email" db:"email"`
 	FirstName        string      `json:"firstName" db:"first_name"`
 	LastName         string      `json:"lastName" db:"last_name"`
 	IssueDescription string      `json:"issueDescription" db:"issue_description"`
