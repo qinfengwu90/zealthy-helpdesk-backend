@@ -10,7 +10,7 @@ import (
 func SendEmailUpdate(ticketID int64, newStatus, adminResponse null.String) error {
 	emailContent := fmt.Sprintf("Your ticket #%d has been updated to ", ticketID)
 	if newStatus.Valid {
-		emailContent += fmt.Sprintf("status: %s", formatStatus(newStatus.String))
+		emailContent += fmt.Sprintf("status: %s", FormatStatus(newStatus.String))
 	}
 	if adminResponse.Valid {
 		emailContent += fmt.Sprintf(", with admin response: %s", adminResponse.String)
@@ -30,7 +30,7 @@ func GetAllTicketsAndEmailUpdatesFromUser(email, lastName string) ([]model.Ticke
 	return tickets, notifications, nil
 }
 
-func formatStatus(status string) string {
+func FormatStatus(status string) string {
 	switch status {
 	case "new":
 		return "New"

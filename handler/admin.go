@@ -80,5 +80,8 @@ func getAllTicketsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	for ticket := range tickets {
+		tickets[ticket].Status = service.FormatStatus(tickets[ticket].Status)
+	}
 	utility.RespondJson(w, map[string]any{"tickets": tickets})
 }
