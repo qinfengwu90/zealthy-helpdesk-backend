@@ -35,7 +35,6 @@ func getAllTicketsAndEmailUpdatesForUserHandler(w http.ResponseWriter, r *http.R
 func editUserTicketHandler(w http.ResponseWriter, r *http.Request) {
 	// Get ticket info from request body
 	var input struct {
-		Email            string `json:"email"`
 		TicketID         string `json:"ticketId"`
 		IssueDescription string `json:"issueDescription"`
 	}
@@ -45,7 +44,7 @@ func editUserTicketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = dao.EditUserTicket(input.Email, input.TicketID, input.IssueDescription)
+	err = dao.EditUserTicket(input.TicketID, input.IssueDescription)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
